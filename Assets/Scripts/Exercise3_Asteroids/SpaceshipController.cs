@@ -53,7 +53,7 @@ public class AsteroidsPlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        moveDirection = (thrustInput * Vector3.up + rotationInput * Vector3.right).normalized;
+        moveDirection = (thrustInput * transform.up).normalized;
         HandleThrust();
     }
 
