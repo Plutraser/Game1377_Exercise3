@@ -59,19 +59,12 @@ public class AsteroidsPlayerController : MonoBehaviour
 
     private void HandleRotation()
     {
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.Rotate(Vector3.back * rotationSpeed * Time.deltaTime);
-        }
+        transform.Rotate(Vector3.back * rotationInput * rotationSpeed * Time.deltaTime);
     }
 
     private void HandleThrust()
     {
-        if (Input.GetKey(KeyCode.W)) //Change this to button later?
+        if (Input.GetButton("Vertical"))
         {
             rb.AddForce(moveDirection * thrustForce, ForceMode2D.Force);
             if (rb.linearVelocity.magnitude > maxThrust)  // Figuring out the total speed of the object is greater than the max speed
@@ -106,8 +99,7 @@ public class AsteroidsPlayerController : MonoBehaviour
 
     private void TeleportToRandomLocation()
     {
-        Vector3 randomLocation = new Vector3(Random.Range(-6, 8), Random.Range(-3, 4), 0); //I found the coordinates of the width and height of the screen. Now im randomly picking a number between them.
-        transform.position = randomLocation; //Places object in random coordinates
-        Debug.Log("Left shift pressed.");
+        Vector3 randomLocation = new Vector3(Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight), Random.Range(ScreenBounds.ScreenBottom, ScreenBounds.ScreenTop), 0); 
+        transform.position = randomLocation; //Places ship in random coordinates
     }
 }
