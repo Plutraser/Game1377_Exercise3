@@ -1,27 +1,3 @@
-/*
- * Assignment: AsteroidsGame - SpaceshipController Script - PART 1 & 2
- * 
- * Objective:
- * Implement a player controller for a spaceship in an Asteroids prototype. The player should be able to rotate the ship,
- * move forward, wrap around the screen, and shoot bullets. 
- * 
- * Requirements:
- * PART 1: Player Movement
- * 1. The player should be able to rotate the ship left and right using A/D keys from an input axis.
- *      This movement should be done with Transform based movement. 
- * 2. The player should be able to thrust forward using only the W key from an input axis
- *      This movement should be done with physics applied to a RigidBody2D. 
- * 3. The player should be able to wrap around the screen when they go off one edge and come back on the other side.
- * 4. The player should be able to teleport to a random location on the screen using left shift in an input button. You 
- *      do not need to check if there is an asteroid there. 
- *      Hint: For determining the random location, you can use the ScreenBounds class (see ScreenWrap.cs for how to use)
- *      
- * PART 2: Shooting
- * 1. The player should be able to shoot bullets using the space key in an input button
- *      Bullets should only go in the direction the ship is facing and bullet speed should be controlled by the Bullet.cs
- 
- */
-
 using UnityEngine;
 
 public class AsteroidsPlayerController : MonoBehaviour
@@ -33,9 +9,11 @@ public class AsteroidsPlayerController : MonoBehaviour
     [SerializeField] private Transform firePoint;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] Vector2 moveDirection;
+    [SerializeField] private float fireRate = 0.15f;
 
     private float rotationInput;
     private float thrustInput;
+    private float nextFireTime;
 
     void Start()
     {
@@ -47,38 +25,42 @@ public class AsteroidsPlayerController : MonoBehaviour
         rotationInput = Input.GetAxis("Horizontal");
         thrustInput = Input.GetAxis("Vertical");
         HandleRotation();
-        HandleFire();
         HandleHyperspace();
+        FireBullet();
     }
 
     void FixedUpdate()
     {
-        moveDirection = (thrustInput * transform.up).normalized;
+        moveDirection = (thrustInput * transform.up);
         HandleThrust();
     }
 
+    /// <summary>
+    /// Handles the rotation of ship using A and D
+    /// </summary>
     private void HandleRotation()
     {
         transform.Rotate(Vector3.back * rotationInput * rotationSpeed * Time.deltaTime);
     }
 
+    /// <summary>
+    /// Handles the movement of the ship, if pressing forward the ship will move forward. Does not allow movement backward
+    /// </summary>
     private void HandleThrust()
     {
-        if (Input.GetButton("Vertical"))
+        if (thrustInput > 0)
         {
             rb.AddForce(moveDirection * thrustForce, ForceMode2D.Force);
-            if (rb.linearVelocity.magnitude > maxThrust)  // Figuring out the total speed of the object is greater than the max speed
-            {
-                rb.linearVelocity = rb.linearVelocity.normalized * maxThrust; //Capping the speed 
-            }
+        }
+        if (rb.linearVelocity.magnitude > maxThrust)
+        {
+            rb.linearVelocity = rb.linearVelocity.normalized * maxThrust;
         }
     }
 
-    private void HandleFire()
-    {
-
-    }
-
+    /// <summary>
+    /// Fires the bullet when space is pressed, assigns a fire rate in which the player cannot exceed.
+    /// </summary>
     private void FireBullet()
     {
         if (bulletPrefab == null)
@@ -86,20 +68,31 @@ public class AsteroidsPlayerController : MonoBehaviour
             Debug.LogWarning("Bullet prefab not assigned!");
             return;
         }
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        if (Input.GetButtonDown("Fire1") && Time.time >= nextFireTime)
+        {
+            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+            nextFireTime = Time.time + fireRate;
+        }
+        
     }
 
+    /// <summary>
+    /// Checks for teleport button press, button is "Left Shift"
+    /// </summary>
     private void HandleHyperspace()
     {
-        if (Input.GetButtonDown("Fire2"))
+        if (Input.GetButtonDown("Teleport"))
         {
             TeleportToRandomLocation();
         }
     }
 
+    /// <summary>
+    /// Teleports to the ship in a random location within the screenbounds
+    /// </summary>
     private void TeleportToRandomLocation()
     {
         Vector3 randomLocation = new Vector3(Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight), Random.Range(ScreenBounds.ScreenBottom, ScreenBounds.ScreenTop), 0); 
-        transform.position = randomLocation; //Places ship in random coordinates
+        transform.position = randomLocation;
     }
 }

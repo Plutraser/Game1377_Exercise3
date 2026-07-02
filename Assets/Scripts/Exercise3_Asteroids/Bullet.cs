@@ -20,14 +20,25 @@ public class Bullet : MonoBehaviour
 {
     [SerializeField] private float bulletSpeed = 20f;
     [SerializeField] private float bulletLifetime = 5f;
+    private Rigidbody2D rb;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
 
     void Start()
     {
-
+        rb.linearVelocity = transform.up * bulletSpeed;
+        Destroy(gameObject, bulletLifetime);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="collision"></param>
     void OnCollisionEnter2D(Collision2D collision)
     {
-
+        // create a collision code
     }
 }
