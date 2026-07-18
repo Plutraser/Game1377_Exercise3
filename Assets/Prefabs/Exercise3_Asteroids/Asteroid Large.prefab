@@ -20,6 +20,14 @@ PrefabInstance:
       propertyPath: childSpawnRadius
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1513371108008136396, guid: 49231704176064f44ab3ec917358cd46, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -712631045867808456, guid: b670ab75dde984907b8570040daa08c5, type: 3}
+    - target: {fileID: 1576636120338699931, guid: 49231704176064f44ab3ec917358cd46, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6790365087698017345, guid: 49231704176064f44ab3ec917358cd46, type: 3}
       propertyPath: m_LocalScale.x
       value: 1

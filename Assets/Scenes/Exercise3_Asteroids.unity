@@ -290,6 +290,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35b156e90c332204ab9d38ba799ba0d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AsteroidSpawner
+  asteroidPrefabs:
+  - {fileID: 3242517970010296397, guid: 3b5987f63da87b141a216d4af77cafbb, type: 3}
+  - {fileID: 7191885229915812583, guid: 49231704176064f44ab3ec917358cd46, type: 3}
+  - {fileID: 8730189705238761009, guid: 91552452341758443a49a0520fe30970, type: 3}
+  initialAsteroids: 5
 --- !u!1 &622455421
 GameObject:
   m_ObjectHideFlags: 0
