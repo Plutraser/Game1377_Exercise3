@@ -1,7 +1,9 @@
 using UnityEngine;
+using UnityEngine.Animations;
 
 public class AsteroidsPlayerController : MonoBehaviour
 {
+    public Animator DeathAnimation;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private float rotationSpeed = 360f;
     [SerializeField] private float thrustForce = 10f;
@@ -10,6 +12,8 @@ public class AsteroidsPlayerController : MonoBehaviour
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] Vector2 moveDirection;
     [SerializeField] private float fireRate = 0.15f;
+    public bool IsDead = false;
+    private bool isThrusting = false;
 
     private float rotationInput;
     private float thrustInput;
@@ -17,11 +21,16 @@ public class AsteroidsPlayerController : MonoBehaviour
 
     void Start()
     {
+        DeathAnimation = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
+        if (IsDead)
+        {
+            DeathAnimation.SetBool("IsDead", true);
+        }
         rotationInput = Input.GetAxis("Horizontal");
         thrustInput = Input.GetAxis("Vertical");
         HandleRotation();
@@ -51,10 +60,15 @@ public class AsteroidsPlayerController : MonoBehaviour
         if (thrustInput > 0)
         {
             rb.AddForce(moveDirection * thrustForce, ForceMode2D.Force);
+            DeathAnimation.SetBool("isThrusting", true);
         }
         if (rb.linearVelocity.magnitude > maxThrust)
         {
             rb.linearVelocity = rb.linearVelocity.normalized * maxThrust;
+        }
+        if (thrustInput <= 0)
+        {
+            DeathAnimation.SetBool("isThrusting", false);
         }
     }
 

@@ -58,7 +58,9 @@ public class Asteroid : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            Destroy(collision.gameObject);
+            collision.gameObject.GetComponent<AsteroidsPlayerController>().IsDead = true;
+            //collision.gameObject.GetComponent<AsteroidsPlayerController>().DeathAnimation.SetTrigger("Death Animation");
+            Destroy(collision.gameObject, .35f);
         }
     }
 }
