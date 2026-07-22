@@ -5,7 +5,8 @@ public class Asteroid : MonoBehaviour
 {
     public enum AsteroidSize { Small, Medium, Large }
 
-    public AsteroidSpawner AsteroidSpawnerScript;
+    public ObjectSpawner AsteroidSpawnerScript;
+    public Animator AsteroidExplosion;
     [SerializeField] private AsteroidSize size;
     [SerializeField] private float speed;
     [SerializeField] private float minRotationSpeed = -180f;
@@ -13,11 +14,13 @@ public class Asteroid : MonoBehaviour
 
     private float rotateSpeed;
     private Rigidbody2D rb;
-    private AsteroidSpawner spawner;
+    private ObjectSpawner spawner;
     private int babyAsteroidCount = 2;
+    public bool IsDestroyed = false;
 
     void Start()
     {
+        AsteroidExplosion = GetComponent<Animator>();
         rotateSpeed = Random.Range(minRotationSpeed, maxRotationSpeed);
         rb = GetComponent<Rigidbody2D>();
         rb.AddForce(new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), 0).normalized * speed, ForceMode2D.Impulse);
@@ -25,6 +28,10 @@ public class Asteroid : MonoBehaviour
 
     void Update()
     {
+        if (IsDestroyed)
+        {
+            AsteroidExplosion.SetBool("IsDestroyed", true);
+        }
         transform.Rotate(Vector3.back * rotateSpeed * Time.deltaTime);
     }
 
@@ -58,9 +65,8 @@ public class Asteroid : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            collision.gameObject.GetComponent<AsteroidsPlayerController>().IsDead = true;
-            //collision.gameObject.GetComponent<AsteroidsPlayerController>().DeathAnimation.SetTrigger("Death Animation");
-            Destroy(collision.gameObject, .35f);
+            SpaceshipController spaceship = collision.gameObject.GetComponent<SpaceshipController>();
+            spaceship.AttackedByAsteroid();
         }
     }
 }

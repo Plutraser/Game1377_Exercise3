@@ -8,6 +8,8 @@ public class Bullet : MonoBehaviour
     [SerializeField] private float bulletLifetime = 5f;
     private Rigidbody2D rb;
 
+    private float asteroidExplodeDuration = .22f;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -27,8 +29,9 @@ public class Bullet : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Asteroid"))
         {
+            collision.gameObject.GetComponent<Asteroid>().IsDestroyed = true;
             collision.gameObject.GetComponent<Asteroid>().BreakAsteroid();
-            Destroy(collision.gameObject);
+            Destroy(collision.gameObject, asteroidExplodeDuration);
             Destroy(gameObject);
         }
     }
