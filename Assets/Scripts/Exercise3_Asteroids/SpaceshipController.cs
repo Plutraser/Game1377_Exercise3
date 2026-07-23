@@ -29,7 +29,7 @@ public class SpaceshipController : MonoBehaviour
     public int Lives = 3;
     private float spaceshipDeathAnimationDuration = .5f;
     private int safeDistance = 3;
-    public List<GameObject> asteroids = new List<GameObject>();
+    //
     private float rotationInput;
     private float thrustInput;
     private float nextFireTime;
@@ -185,10 +185,9 @@ public class SpaceshipController : MonoBehaviour
     private void TeleportToRandomLocation()
     {
         Vector3 randomLocation = new Vector3(Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight), Random.Range(ScreenBounds.ScreenBottom, ScreenBounds.ScreenTop), 0);
-        
-        for (int i = 0; i < asteroids.Count; i++)
+        for (int i = 0; i < GetComponent<ObjectSpawner>().asteroids.Count; i++)
         {
-            Vector3 fromRandomLocationToAsteroid = asteroids[i].transform.position - randomLocation;
+            Vector3 fromRandomLocationToAsteroid = GetComponent<ObjectSpawner>().asteroids[i].transform.position - randomLocation;
             while (fromRandomLocationToAsteroid.magnitude > safeDistance)
             {
                 randomLocation = new Vector3(Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight), Random.Range(ScreenBounds.ScreenBottom, ScreenBounds.ScreenTop), 0);

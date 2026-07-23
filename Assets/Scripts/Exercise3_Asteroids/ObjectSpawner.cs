@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ObjectSpawner : MonoBehaviour
@@ -17,7 +18,8 @@ public class ObjectSpawner : MonoBehaviour
     private float spawnYMinPowerups = 0f;
 
     private float playerSafeDistance = 3;
-    
+
+    public List<GameObject> asteroids = new List<GameObject>();
     void Start()
     {
         float screenHalfHeight = Camera.main.orthographicSize;
@@ -65,9 +67,8 @@ public class ObjectSpawner : MonoBehaviour
     {
         // Spawn an asteroid at the location specified by position parameter with the size specified by the size parameter.
         GameObject spawnedAsteroid = Instantiate(asteroidPrefabs[(int)size], position, asteroidPrefabs[(int)size].transform.rotation);
-        //GetComponent<SpaceshipController>().asteroids.Add(spawnedAsteroid);
+        asteroids.Add(spawnedAsteroid);
         spawnedAsteroid.GetComponent<Asteroid>().AsteroidSpawnerScript = this;
-        
     }
 
     private void SpawnAllPowerups(Vector3 position, int powerup)
