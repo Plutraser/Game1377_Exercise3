@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Asteroid
   - Bullet
+  - MovementPowerup
+  - BulletPowerup
+  - LifePowerup
   layers:
   - Default
   - TransparentFX
@@ -13,7 +16,7 @@ TagManager:
   - Asteroids
   - Water
   - UI
-  - 
+  - Powerups
   - 
   - 
   - 

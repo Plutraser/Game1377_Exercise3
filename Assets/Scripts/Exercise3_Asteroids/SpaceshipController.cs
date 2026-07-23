@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
 using System.Collections.Generic;
+using UnityEngine.Audio;
 
 public class SpaceshipController : MonoBehaviour
 {
@@ -10,7 +11,12 @@ public class SpaceshipController : MonoBehaviour
     /// Organize all of these later with headers and shit
     /// </summary>
     public Animator Animation;
-    private AudioSource audioSource;
+    private AudioSource bulletAudioSource;
+    private AudioSource thrustAudioSource;
+    [SerializeField] private AudioClip bulletsFiredSoundClip;
+    [SerializeField] private AudioClip spaceshipExplodedSoundClip;
+    [SerializeField] private AudioClip hyperspaceSoundClip;
+    [SerializeField] private AudioClip spaceshipThrustSoundClip;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private float rotationSpeed = 360f;
     [SerializeField] private float thrustForce = 10f;
@@ -20,10 +26,8 @@ public class SpaceshipController : MonoBehaviour
     [SerializeField] Vector2 moveDirection;
     [SerializeField] private float fireRate = .35f;
     public bool IsDead = false;
-    private bool isThrusting = false;
-    private bool firedBullet = false;
     public int Lives = 3;
-    private float spaceshipDeathAnimationDuration = .4f;
+    private float spaceshipDeathAnimationDuration = .5f;
     private int safeDistance = 3;
     public List<GameObject> asteroids = new List<GameObject>();
     private float rotationInput;
@@ -37,7 +41,9 @@ public class SpaceshipController : MonoBehaviour
 
     void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
+        bulletAudioSource = GetComponent<AudioSource>();
+        thrustAudioSource = GetComponent<AudioSource>();
+
     }
     void Start()
     {
@@ -93,7 +99,13 @@ public class SpaceshipController : MonoBehaviour
         {
             if (thrustInput > 0)
             {
-                audioSource.Play();
+                float fasterPitch = 1.5f;
+                if (!thrustAudioSource.isPlaying)
+                {
+                    thrustAudioSource.clip = spaceshipThrustSoundClip;
+                    bulletAudioSource.pitch = fasterPitch;
+                    thrustAudioSource.PlayOneShot(spaceshipThrustSoundClip);
+                }
                 rb.AddForce(moveDirection * thrustForce * thrustMultiplier, ForceMode2D.Force);
                 Animation.SetBool("isThrusting", true);
             }
@@ -102,7 +114,13 @@ public class SpaceshipController : MonoBehaviour
         {
             if (thrustInput > 0)
             {
-                audioSource.Play();
+                float regularPitch = 1f;
+                if (!thrustAudioSource.isPlaying)
+                {
+                    thrustAudioSource.clip = spaceshipThrustSoundClip;
+                    bulletAudioSource.pitch = regularPitch;
+                    thrustAudioSource.PlayOneShot(spaceshipThrustSoundClip);
+                }
                 rb.AddForce(moveDirection * thrustForce, ForceMode2D.Force);
                 Animation.SetBool("isThrusting", true);
             }
@@ -114,10 +132,10 @@ public class SpaceshipController : MonoBehaviour
         }
         if (thrustInput <= 0)
         {
-            audioSource.Stop();
             Animation.SetBool("isThrusting", false);
         }
     }
+
 
     /// <summary>
     /// Fires the bullet when space is pressed, assigns a fire rate in which the player cannot exceed.
@@ -131,12 +149,18 @@ public class SpaceshipController : MonoBehaviour
         }
         if (Input.GetButtonDown("Fire1") && Time.time > nextFireTime)
         {
+            float regularPitch = 1f;
+            bulletAudioSource.clip = bulletsFiredSoundClip;
             nextFireTime = Time.time + fireRate;
             Animation.Play("FireBullet");
+            bulletAudioSource.pitch = regularPitch;
+            bulletAudioSource.PlayOneShot(bulletsFiredSoundClip);
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
             if (fatterBullets)
             {
                 float increasedSize = 1f;
+                float lowerPitch = .5f;
+                bulletAudioSource.pitch = lowerPitch;
                 bullet.transform.localScale = new Vector3(increasedSize, increasedSize, 0);
             }
         }
@@ -150,6 +174,7 @@ public class SpaceshipController : MonoBehaviour
     {
         if (Input.GetButtonDown("Teleport"))
         {
+            Animation.SetBool("usedHyperspace", true);
             TeleportToRandomLocation();
         }
     }
@@ -169,13 +194,26 @@ public class SpaceshipController : MonoBehaviour
                 randomLocation = new Vector3(Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight), Random.Range(ScreenBounds.ScreenBottom, ScreenBounds.ScreenTop), 0);
             }
         }
-        transform.position = randomLocation;
+        float animationDuration = .2f;
+        StartCoroutine(TeleportDelay(animationDuration, randomLocation));
+    }
+
+    private IEnumerator TeleportDelay(float duration, Vector3 location)
+    {
+        float volume = 1f;
+        float pitch = 1f;
+        SoundFXManager.instance.PlaySoundFXClip(hyperspaceSoundClip, transform, volume, pitch);
+        Animation.Play("Hyperspace");
+
+        yield return new WaitForSeconds(duration);
+
+        transform.position = location;
     }
 
     public void Respawn()
     {
         float origin = 0;
-        float timer = 2f;
+        float timer = 3f;
         transform.position = new Vector3(origin, origin, origin);
         StartCoroutine(InvincibilityFrames(timer));
     }
@@ -192,6 +230,9 @@ public class SpaceshipController : MonoBehaviour
 
     public void AttackedByAsteroid()
     {
+        float volume = 1f;
+        float pitch = 1f;
+        SoundFXManager.instance.PlaySoundFXClip(spaceshipExplodedSoundClip, transform, volume, pitch);
         Lives -= 1;
         IsDead = true;
         if (Lives > 0)
@@ -201,8 +242,14 @@ public class SpaceshipController : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject, spaceshipDeathAnimationDuration);
+            StartCoroutine(Death(spaceshipDeathAnimationDuration));
         }
+    }
+    
+    private IEnumerator Death(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        Destroy(gameObject);
     }
 
     public void CollectedLifePowerup()

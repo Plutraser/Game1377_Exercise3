@@ -29,8 +29,10 @@ public class Bullet : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Asteroid"))
         {
-            collision.gameObject.GetComponent<Asteroid>().IsDestroyed = true;
-            collision.gameObject.GetComponent<Asteroid>().BreakAsteroid();
+            Asteroid asteroid = collision.gameObject.GetComponent<Asteroid>();
+            asteroid.IsDestroyed = true;
+            asteroid.BreakAsteroid();
+            asteroid.Explode();
             Destroy(collision.gameObject, asteroidExplodeDuration);
             Destroy(gameObject);
         }

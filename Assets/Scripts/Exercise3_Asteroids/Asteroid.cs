@@ -7,6 +7,7 @@ public class Asteroid : MonoBehaviour
 
     public ObjectSpawner AsteroidSpawnerScript;
     public Animator AsteroidExplosion;
+    [SerializeField] private AudioClip asteroidExplodeSoundClip;
     [SerializeField] private AsteroidSize size;
     [SerializeField] private float speed;
     [SerializeField] private float minRotationSpeed = -180f;
@@ -68,5 +69,12 @@ public class Asteroid : MonoBehaviour
             SpaceshipController spaceship = collision.gameObject.GetComponent<SpaceshipController>();
             spaceship.AttackedByAsteroid();
         }
+    }
+
+    public void Explode()
+    {
+        float volume = 1f;
+        float pitch = 1f;
+        SoundFXManager.instance.PlaySoundFXClip(asteroidExplodeSoundClip, transform, volume, pitch);
     }
 }
